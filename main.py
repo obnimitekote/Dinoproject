@@ -31,7 +31,7 @@ ROAD = pygame.image.load(os.path.join("images/other", "Track.png"))
 class Cat():
     X_POS = 80
     Y_POS = 310
-    Y_POS_DOWN = 340
+    Y_POS_DOWN = 310
     JUMP_VEL = 8.5
 
     def __init__(self):
@@ -99,7 +99,7 @@ class Cat():
 
 class Cloud:
     def __init__(self):
-        self.x = SCREEN_WIDTH + random.randint(20, 100)
+        self.x = SCREEN_WIDTH + random.randint(20, 50)
         self.y = random.randint(20, 50)
         self.image = CLOUD
         self.width = self.image.get_width()
@@ -107,18 +107,31 @@ class Cloud:
     def update(self):
         self.x -= game_speed
         if self.x < -self.width:
-            self.x = SCREEN_WIDTH + random.randint(1000,2000)
+            self.x = SCREEN_WIDTH + random.randint(10,20)
             self.y = random.randint(15, 90)
 
     def draw(self, SCREEN):
         SCREEN.blit(self.image, (self.x, self.y))
 def main():
-    global game_speed
+    global game_speed, x_pos_bg, y_pos_bg
     run = True
     clock = pygame.time.Clock()
     player = Cat()
     cloud = Cloud()
-    game_speed = 15
+    game_speed = 14
+    x_pos_bg = 0
+    y_pos_bg = 380
+
+    def background():
+        global x_pos_bg, y_pos_bg
+        image_width = ROAD.get_width()
+        SCREEN.blit(ROAD, (x_pos_bg, y_pos_bg))
+        SCREEN.blit(ROAD, (image_width + x_pos_bg, y_pos_bg))
+        if x_pos_bg <= -image_width:
+            SCREEN.blit(ROAD,(image_width + x_pos_bg, y_pos_bg))
+            x_pos_bg = 0
+        x_pos_bg -= game_speed
+
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -129,6 +142,8 @@ def main():
 
         player.draw(SCREEN)
         player.update(userInput)
+
+        background()
 
         cloud.draw(SCREEN)
         cloud.update()
