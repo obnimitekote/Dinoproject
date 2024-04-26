@@ -1,4 +1,6 @@
 import os
+import random
+
 import pygame
 
 pygame.init()
@@ -56,7 +58,7 @@ class Cat():
         if self.cat_jump:
             self.jump()
 
-        if userInput[pygame.K_UP] and not self.cat_jump:
+        if userInput[pygame.K_SPACE] and not self.cat_jump:
             self.cat_down = False
             self.cat_run = False
             self.cat_jump = True
@@ -95,10 +97,28 @@ class Cat():
     def draw(self, SCREEN):
         SCREEN.blit (self.image, (self.cat_rect.x, self.cat_rect.y))
 
+class Cloud:
+    def __init__(self):
+        self.x = SCREEN_WIDTH + random.randint(20, 100)
+        self.y = random.randint(20, 50)
+        self.image = CLOUD
+        self.width = self.image.get_width()
+
+    def update(self):
+        self.x -= game_speed
+        if self.x < -self.width:
+            self.x = SCREEN_WIDTH + random.randint(1000,2000)
+            self.y = random.randint(15, 90)
+
+    def draw(self, SCREEN):
+        SCREEN.blit(self.image, (self.x, self.y))
 def main():
+    global game_speed
     run = True
     clock = pygame.time.Clock()
     player = Cat()
+    cloud = Cloud()
+    game_speed = 15
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -109,6 +129,9 @@ def main():
 
         player.draw(SCREEN)
         player.update(userInput)
+
+        cloud.draw(SCREEN)
+        cloud.update()
 
         clock.tick(30)
         pygame.display.update()
