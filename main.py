@@ -112,8 +112,30 @@ class Cloud:
 
     def draw(self, SCREEN):
         SCREEN.blit(self.image, (self.x, self.y))
+
+class Obstacle:
+    def __init__(self,image,type):
+        self.image = image
+        self.type = type
+        self.rect = self.image[self.type].get_rect()
+        self.rect.x = SCREEN_WIDTH
+
+    def update(self):
+        self.rect.x -= game_speed
+        if self.rect.x < -self.rect.width:
+            obstacles.pop()
+
+    def draw(self,SCREEN):
+        SCREEN.blit(self.image[self.type],self.rect)
+
+class Smallobst(Obstacle):
+    def __init__(self,image):
+        self.type = random.randint(0,2)
+        super().__init__(image, self.type)
+        self.rect.y = 325
+
 def main():
-    global game_speed, x_pos_bg, y_pos_bg, points
+    global game_speed, x_pos_bg, y_pos_bg, points, obstacles
     run = True
     clock = pygame.time.Clock()
     player = Cat()
@@ -123,6 +145,8 @@ def main():
     y_pos_bg = 380
     points = 0
     font = pygame.font.Font("freesansbold.ttf", 20)
+    obstacles = []
+    death = 0
 
 
     def score():
@@ -155,6 +179,19 @@ def main():
         player.draw(SCREEN)
         player.update(userInput)
 
+        if len(obstacles) == 0:
+            if random.randint(0,2) == 0:
+                obstacles.append(Smallobst(SMALL_CACTUS))
+
+        for obstacle in obstacles:
+            obstacle.draw(SCREEN)
+            obstacle.update()
+            if player.cat_rect.colliderect(obstacle.rect):
+                pygame.time.delay(500)
+                death += 1
+                menu(death)
+
+
         background()
 
         cloud.draw(SCREEN)
@@ -165,4 +202,34 @@ def main():
         clock.tick(30)
         pygame.display.update()
 
-main()
+def menu(death):
+    global points
+    run = True
+    while run:
+        SCREEN.fill((225, 225, 225))
+        font = pygame.font.Font("freesansbold.ttf",30)
+
+        if death == 0:
+            text = font.render("Press any Key to Start", True, (0,0,0))
+        elif death > 0:
+            text = font.render("Press any Key to Try Again", True, (0, 0, 0))
+            score = font.render(f"Your Score: "+ str(points), True,(0,0,0))
+            dead_message = font.render("You killed the cat", True, (200, 0, 0))
+            scoreRect = score.get_rect()
+            scoreRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT //2 + 90)
+            SCREEN.blit(score,scoreRect)
+            dmRect = dead_message.get_rect()
+            dmRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 200)
+            SCREEN.blit(dead_message, dmRect)
+        textRect = text.get_rect()
+        textRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 140)
+        SCREEN.blit(text,textRect)
+        SCREEN.blit(DOWN_CAT[0], (SCREEN_WIDTH // 2-20, SCREEN_HEIGHT // 2-110))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                    main()
+
+menu(death=0)
