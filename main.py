@@ -31,7 +31,7 @@ ROAD = pygame.image.load(os.path.join("images/other", "Track.png"))
 class Cat():
     X_POS = 80
     Y_POS = 310
-    Y_POS_DOWN = 310
+    Y_POS_DOWN = 315
     JUMP_VEL = 8.5
 
     def __init__(self):
@@ -134,6 +134,24 @@ class Smallobst(Obstacle):
         super().__init__(image, self.type)
         self.rect.y = 325
 
+class Bigobst(Obstacle):
+    def __init__(self,image):
+        self.type = random.randint(0,2)
+        super().__init__(image, self.type)
+        self.rect.y = 300
+
+class Birdobst(Obstacle):
+    def __init__(self, image):
+        self.type = 0
+        super().__init__(image, self.type)
+        self.rect.y = 245
+        self.index = 0
+
+    def draw(self,SCREEN):
+        if self.index >= 9:
+            self.index = 0
+        SCREEN.blit(self.image[self.index//5], self.rect)
+        self.index += 1
 def main():
     global game_speed, x_pos_bg, y_pos_bg, points, obstacles
     run = True
@@ -180,8 +198,13 @@ def main():
         player.update(userInput)
 
         if len(obstacles) == 0:
-            if random.randint(0,2) == 0:
+            if random.randint(0, 2) == 0:
                 obstacles.append(Smallobst(SMALL_CACTUS))
+            elif random.randint(0, 2) == 1:
+                obstacles.append(Bigobst(BIG_CACTUS))
+            elif random.randint(0, 2) == 2:
+                obstacles.append(Birdobst(BIRD))
+
 
         for obstacle in obstacles:
             obstacle.draw(SCREEN)
@@ -206,7 +229,7 @@ def menu(death):
     global points
     run = True
     while run:
-        SCREEN.fill((225, 225, 225))
+        SCREEN.fill((200, 200, 225))
         font = pygame.font.Font("freesansbold.ttf",30)
 
         if death == 0:
