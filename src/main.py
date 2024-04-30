@@ -28,6 +28,7 @@ CLOUD = pygame.image.load(os.path.join("images/other", "Cloud.png"))
 
 ROAD = pygame.image.load(os.path.join("images/other", "Track.png"))
 
+
 class Cat():
     X_POS = 80
     Y_POS = 310
@@ -95,7 +96,8 @@ class Cat():
             self.jump_vel = self.JUMP_VEL
 
     def draw(self, SCREEN):
-        SCREEN.blit (self.image, (self.cat_rect.x, self.cat_rect.y))
+        SCREEN.blit(self.image, (self.cat_rect.x, self.cat_rect.y))
+
 
 class Cloud:
     def __init__(self):
@@ -107,14 +109,15 @@ class Cloud:
     def update(self):
         self.x -= game_speed
         if self.x < -self.width:
-            self.x = SCREEN_WIDTH + random.randint(10,20)
+            self.x = SCREEN_WIDTH + random.randint(10, 20)
             self.y = random.randint(15, 90)
 
     def draw(self, SCREEN):
         SCREEN.blit(self.image, (self.x, self.y))
 
+
 class Obstacle:
-    def __init__(self,image,type):
+    def __init__(self, image, type):
         self.image = image
         self.type = type
         self.rect = self.image[self.type].get_rect()
@@ -125,20 +128,23 @@ class Obstacle:
         if self.rect.x < -self.rect.width:
             obstacles.pop()
 
-    def draw(self,SCREEN):
-        SCREEN.blit(self.image[self.type],self.rect)
+    def draw(self, SCREEN):
+        SCREEN.blit(self.image[self.type], self.rect)
+
 
 class Smallobst(Obstacle):
-    def __init__(self,image):
-        self.type = random.randint(0,2)
+    def __init__(self, image):
+        self.type = random.randint(0, 2)
         super().__init__(image, self.type)
         self.rect.y = 325
 
+
 class Bigobst(Obstacle):
-    def __init__(self,image):
-        self.type = random.randint(0,2)
+    def __init__(self, image):
+        self.type = random.randint(0, 2)
         super().__init__(image, self.type)
         self.rect.y = 300
+
 
 class Birdobst(Obstacle):
     def __init__(self, image):
@@ -147,11 +153,13 @@ class Birdobst(Obstacle):
         self.rect.y = 245
         self.index = 0
 
-    def draw(self,SCREEN):
+    def draw(self, SCREEN):
         if self.index >= 9:
             self.index = 0
-        SCREEN.blit(self.image[self.index//5], self.rect)
+        SCREEN.blit(self.image[self.index // 5], self.rect)
         self.index += 1
+
+
 def main():
     global game_speed, x_pos_bg, y_pos_bg, points, obstacles
     run = True
@@ -166,13 +174,12 @@ def main():
     obstacles = []
     death = 0
 
-
     def score():
         global points, game_speed
         points += 1
         if points % 100 == 0:
             game_speed += 1
-        text = font.render(f"Points: "+ str(points), True,(0,0,0))
+        text = font.render(f"Points: " + str(points), True, (0, 0, 0))
         textRect = text.get_rect()
         SCREEN.blit(text, textRect)
 
@@ -182,7 +189,7 @@ def main():
         SCREEN.blit(ROAD, (x_pos_bg, y_pos_bg))
         SCREEN.blit(ROAD, (image_width + x_pos_bg, y_pos_bg))
         if x_pos_bg <= -image_width:
-            SCREEN.blit(ROAD,(image_width + x_pos_bg, y_pos_bg))
+            SCREEN.blit(ROAD, (image_width + x_pos_bg, y_pos_bg))
             x_pos_bg = 0
         x_pos_bg -= game_speed
 
@@ -205,7 +212,6 @@ def main():
             elif random.randint(0, 2) == 2:
                 obstacles.append(Birdobst(BIRD))
 
-
         for obstacle in obstacles:
             obstacle.draw(SCREEN)
             obstacle.update()
@@ -213,7 +219,6 @@ def main():
                 pygame.time.delay(500)
                 death += 1
                 menu(death)
-
 
         background()
 
@@ -225,34 +230,36 @@ def main():
         clock.tick(30)
         pygame.display.update()
 
+
 def menu(death):
     global points
     run = True
+    font = pygame.font.Font("freesansbold.ttf", 30)
     while run:
         SCREEN.fill((200, 200, 225))
-        font = pygame.font.Font("freesansbold.ttf",30)
 
         if death == 0:
-            text = font.render("Press any Key to Start", True, (0,0,0))
+            text = font.render("Press any Key to Start", True, (0, 0, 0))
         elif death > 0:
             text = font.render("Press any Key to Try Again", True, (0, 0, 0))
-            score = font.render(f"Your Score: "+ str(points), True,(0,0,0))
+            score = font.render(f"Your Score: " + str(points), True, (0, 0, 0))
             dead_message = font.render("You killed the cat", True, (200, 0, 0))
             scoreRect = score.get_rect()
-            scoreRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT //2 + 90)
-            SCREEN.blit(score,scoreRect)
+            scoreRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 90)
+            SCREEN.blit(score, scoreRect)
             dmRect = dead_message.get_rect()
             dmRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 200)
             SCREEN.blit(dead_message, dmRect)
         textRect = text.get_rect()
         textRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 140)
-        SCREEN.blit(text,textRect)
+        SCREEN.blit(text, textRect)
         SCREEN.blit(DOWN_CAT[0], (SCREEN_WIDTH // 2-20, SCREEN_HEIGHT // 2-110))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
-                    main()
+                main()
+
 
 menu(death=0)
